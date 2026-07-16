@@ -3,20 +3,21 @@ import * as projectsService from "./projects.service";
 
 export const projectsRouter = Router();
 
-projectsRouter.get("/", (req: Request, res: Response) => {
-    res.json(projectsService.findAll());
+projectsRouter.get("/", async (req: Request, res: Response) => {
+    const projects = await projectsService.findAll();
+    res.json(projects);
 });
 
-projectsRouter.get("/:id", (req: Request, res: Response) => {
-    const project = projectsService.findById(Number(req.params.id));
+projectsRouter.get("/:id", async (req: Request, res: Response) => {
+    const project = await projectsService.findById(Number(req.params.id));
     if (!project) {
         return res.status(404).json({ message: "Project not found" });
     }
     res.json(project);
 });
 
-projectsRouter.post("/", (req: Request, res: Response) => {
+projectsRouter.post("/", async (req: Request, res: Response) => {
     const { name, description } = req.body;
-    const project = projectsService.create(name, description);
+    const project = await projectsService.create(name, description);
     res.status(201).json(project);
 });
