@@ -13,8 +13,28 @@ datasource db {
 }
 
 model Project {
-  id          Int      @id @default(autoincrement())
-  name        String
+  id Int @id @default(autoincrement())
+  name String
   description String
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
+  contextEntries ContextEntry[]
+}
+
+enum entryType {
+  DECISION
+  CONVENTION
+  SNIPPET
+  TASK_STATUS
+}
+
+model ContextEntry {
+  id Int @id @default(autoincrement())
+  type entryType
+  title String
+  content String
+  active Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  project Project @relation(fields: [projectId], references: [id])
+  projectId Int
 }
