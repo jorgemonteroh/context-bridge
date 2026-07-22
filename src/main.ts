@@ -5,6 +5,7 @@ import { contextEntriesRouter } from './context-entries/context-entries.controll
 import { projectsRouter } from './projects/projects.controller';
 
 const app = express();
+app.use(express.static('public'));
 app.use(express.json());
 app.use('/projects', projectsRouter);
 app.use('/projects/:projectId/context-entries', contextEntriesRouter);
