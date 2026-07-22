@@ -21,6 +21,27 @@
         <button id="copyBtn">Copiar al portapapeles</button>
         <span id="status"></span>
 
+        <hr />
+
+        <h2>Context Entries</h2>
+        <ul id="entriesList"></ul>
+        
+        <h3>Nueva entry</h3>
+        <form id="entryForm">
+            <select id="entryType">
+            <option value="DECISION">Decisión</option>
+            <option value="CONVENTION">Convención</option>
+            <option value="SNIPPET">Snippet</option>
+            <option value="TASK_STATUS">Estado de tarea</option>
+            </select>
+            <br /><br />
+            <input id="entryTitle" placeholder="Título" required />
+            <br /><br />
+            <textarea id="entryContent" placeholder="Contenido" required style="height: 100px;"></textarea>
+            <br /><br />
+            <button type="submit">Añadir entry</button>
+        </form>
+
         <script src="app.js"></script>
     </body>
 </html>
