@@ -4,9 +4,9 @@ import { entryType, PrismaClient } from '../generated/prisma';
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
 const prisma = new PrismaClient({ adapter })
 
-export async function findAllByProject(projectId: number) {
+export async function findAllByProject(projectId: number, includeInactive = false) {
     return prisma.contextEntry.findMany({
-        where: { projectId, active: true }
+        where: includeInactive ? { projectId } : { projectId, active: true },
     });
 }
 
@@ -21,4 +21,11 @@ export async function deactivate(id: number) {
         where: { id },
         data: { active: false }
     });
+}
+
+export async function activate(id: number) {
+  return prisma.contextEntry.update({
+    where: { id },
+    data: { active: true },
+  });
 }

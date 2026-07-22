@@ -25,26 +25,29 @@ async function loadEntries() {
   const projectId = projectSelect.value;
   if (!projectId) return;
 
-  const res = await fetch(`/projects/${projectId}/context-entries`);
+  const res = await fetch(`/projects/${projectId}/context-entries?includeInactive=true`);
   const entries = await res.json();
 
   entriesList.innerHTML = '';
   for (const entry of entries) {
     const li = document.createElement('li');
-    li.textContent = `[${entry.type}] ${entry.title}: ${entry.content} `;
+    const activeLabel = entry.active ? '' : ' (inactiva)';
+    li.textContent = `[${entry.type}] ${entry.title}: ${entry.content}${activeLabel} `;
 
-    const deactivateBtn = document.createElement('button');
-    deactivateBtn.textContent = 'Desactivar';
-    deactivateBtn.addEventListener('click', () => deactivateEntry(entry.id));
+    const toggleBtn = document.createElement('button');
+    toggleBtn.textContent = entry.active ? 'Desactivar' : 'Activar';
+    toggleBtn.addEventListener('click', () => toggleEntry(entry.id, entry.active));
 
-    li.appendChild(deactivateBtn);
+    li.appendChild(toggleBtn);
     entriesList.appendChild(li);
   }
 }
 
-async function deactivateEntry(id) {
+async function toggleEntry(id, isActive) {
   const projectId = projectSelect.value;
-  await fetch(`/projects/${projectId}/context-entries/${id}`, { method: 'DELETE' });
+  const action = isActive ? '' : '/activate';
+  const method = isActive ? 'DELETE' : 'PATCH';
+  await fetch(`/projects/${projectId}/context-entries/${id}${action}`, { method });
   await loadEntries();
 }
 
