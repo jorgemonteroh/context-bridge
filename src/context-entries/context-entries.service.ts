@@ -16,6 +16,13 @@ export async function create(projectId: number, type: entryType, title: string, 
     });
 }
 
+export async function update(id: number, type: entryType, title: string, content: string) {
+    return prisma.contextEntry.update({
+        where: { id },
+        data: { type, title, content }
+    });
+}
+
 export async function deactivate(id: number) {
     return prisma.contextEntry.update({
         where: { id },

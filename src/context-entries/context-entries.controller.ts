@@ -22,6 +22,12 @@ contextEntriesRouter.delete('/:id', async (req: Request, res: Response) => {
     res.status(204).send();
 });
 
+contextEntriesRouter.patch('/:id', async (req: Request, res: Response) => {
+    const { type, title, content } = req.body;
+    const entry = await contextEntriesService.update(Number(req.params.id), type, title, content);
+    res.json(entry);
+});
+
 contextEntriesRouter.patch('/:id/activate', async (req: Request, res: Response) => {
   const entry = await contextEntriesService.activate(Number(req.params.id));
   res.json(entry);

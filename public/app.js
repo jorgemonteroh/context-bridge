@@ -6,6 +6,9 @@ const status = document.getElementById('status');
 const entriesList = document.getElementById('entriesList');
 const entryForm = document.getElementById('entryForm');
 const projectForm = document.getElementById('projectForm');
+const entrySubmitBtn = entryForm.querySelector('button[type="submit"]');
+
+let updatingEntryId = null;
 
 async function loadProjects() {
   const res = await fetch('/projects');
@@ -39,7 +42,12 @@ async function loadEntries() {
     toggleBtn.textContent = entry.active ? 'Desactivar' : 'Activar';
     toggleBtn.addEventListener('click', () => toggleEntry(entry.id, entry.active));
 
+    const updateBtn = document.createElement('button');
+    updateBtn.textContent = 'Editar';
+    updateBtn.addEventListener('click', () => startUpdateEntry(entry));
+
     li.appendChild(toggleBtn);
+    li.appendChild(updateBtn);
     entriesList.appendChild(li);
   }
 }
@@ -52,6 +60,14 @@ async function toggleEntry(id, isActive) {
   await loadEntries();
 }
 
+function startUpdateEntry(entry) {
+  updatingEntryId = entry.id;
+  document.getElementById('entryType').value = entry.type;
+  document.getElementById('entryTitle').value = entry.title;
+  document.getElementById('entryContent').value = entry.content;
+  entrySubmitBtn.textContent = 'Guardar cambios';
+}
+
 async function createEntry(event) {
   event.preventDefault();
 
@@ -62,13 +78,22 @@ async function createEntry(event) {
 
   const bodyJson = JSON.stringify({ type, title, content });
 
-  await fetch(`/projects/${projectId}/context-entries`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json; charset=utf-8' },
-    body: bodyJson,
-  });
+  if (updatingEntryId) {
+    await fetch(`/projects/${projectId}/context-entries/${updatingEntryId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json; charset=utf-8'},
+      body: bodyJson,
+    });
+  } else {
+    await fetch(`/projects/${projectId}/context-entries`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      body: bodyJson,
+    });
+  }
 
   entryForm.reset();
+  entrySubmitBtn.textContent = 'Añadir entry';
   await loadEntries();
 }
 
