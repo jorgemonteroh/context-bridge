@@ -5,6 +5,7 @@ const copyBtn = document.getElementById('copyBtn');
 const status = document.getElementById('status');
 const entriesList = document.getElementById('entriesList');
 const entryForm = document.getElementById('entryForm');
+const projectForm = document.getElementById('projectForm');
 
 async function loadProjects() {
   const res = await fetch('/projects');
@@ -71,6 +72,24 @@ async function createEntry(event) {
   await loadEntries();
 }
 
+async function createProject(event) {
+  event.preventDefault();
+
+  const name = document.getElementById('projectName').value;
+  const description = document.getElementById('projectDescription').value;
+
+  const bodyJson = JSON.stringify({ name, description });
+
+  await fetch('/projects', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json; charset=utf-8' },
+    body: bodyJson,
+  });
+
+  projectForm.reset();
+  await loadProjects();
+}
+
 async function compileContext() {
   const projectId = projectSelect.value;
   if (!projectId) return;
@@ -89,6 +108,7 @@ async function copyToClipboard() {
 compileBtn.addEventListener('click', compileContext);
 copyBtn.addEventListener('click', copyToClipboard);
 entryForm.addEventListener('submit', createEntry);
+projectForm.addEventListener('submit', createProject);
 projectSelect.addEventListener('change', loadEntries);
 
 loadProjects();
