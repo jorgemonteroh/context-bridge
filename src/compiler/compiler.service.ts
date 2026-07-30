@@ -1,4 +1,5 @@
 import { PrismaPg } from '@prisma/adapter-pg';
+import { NotFoundError } from '../errors';
 import { PrismaClient, entryType } from '../generated/prisma';
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL});
@@ -7,7 +8,7 @@ const prisma = new PrismaClient({ adapter });
 export async function compileContext(projectId: number): Promise<string> {
     const project = await prisma.project.findUnique({ where: { id: projectId } });
     if (!project) {
-        throw new Error(`Project with ID ${projectId} not found`);
+        throw new NotFoundError(`Project with ID ${projectId} not found`);
     }
 
     const entries = await prisma.contextEntry.findMany({ where: { projectId, active: true }, orderBy: { type: 'asc' } });

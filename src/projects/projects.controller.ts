@@ -10,9 +10,6 @@ projectsRouter.get("/", async (req: Request, res: Response) => {
 
 projectsRouter.get("/:id", async (req: Request, res: Response) => {
     const project = await projectsService.findById(Number(req.params.id));
-    if (!project) {
-        return res.status(404).json({ message: "Project not found" });
-    }
     res.json(project);
 });
 
