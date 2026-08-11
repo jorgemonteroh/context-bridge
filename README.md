@@ -9,6 +9,7 @@ En vez de re-explicar desde cero el estado del proyecto cada vez que cambias de 
 - Node.js + Express + TypeScript
 - PostgreSQL 16 (vía Docker)
 - Prisma 7 (ORM)
+- Zod (validación de inputs)
 - Frontend: HTML/JS plano, servido como estático desde Express
 
 ## Cómo levantar el proyecto
@@ -27,17 +28,18 @@ Abre `http://localhost:3000` para la UI.
 
 ### Hecho
 
-- CRUD de `Project` (crear, listar) vía API
-- CRUD de `ContextEntry` (crear, listar, desactivar, reactivar) vía API y UI
+- CRUD de `Project` (crear, listar) vía API y UI
+- CRUD de `ContextEntry` (crear, listar, editar, desactivar, reactivar) vía API y UI
 - Compilador de contexto: agrupa entries activas por tipo (`DECISION`, `CONVENTION`, `SNIPPET`, `TASK_STATUS`) y genera un prompt formateado
-- Frontend mínimo: selector de proyecto, formulario de creación de entries, lista con toggle activar/desactivar, botón de copiar contexto compilado
+- Frontend mínimo: creación de proyectos, selector de proyecto, formulario de creación/edición de entries, lista con toggle activar/desactivar, botón de copiar contexto compilado
+- Manejo de errores centralizado: middleware global en Express que traduce `AppError`/`NotFoundError` y `ZodError` a respuestas HTTP consistentes, en vez de try/catch repetido por controller
+- Validación de inputs con Zod en la creación/edición de proyectos y context entries, devolviendo 400 con detalle del campo que falló
 
 ### Pendiente / ideas para seguir
 
-- Crear proyectos desde la UI (ahora mismo solo por API) — en progreso
-- Editar el contenido de una context entry existente, no solo activar/desactivar
-- Manejo de errores centralizado (middleware global de Express, en vez de try/catch repetido por controller)
-- Validación de inputs con una librería tipada (ej. `zod`) en vez de confiar en que el body llega bien formado
+- Tests automatizados (aún no hay ninguno)
+- Manejar el caso de crear una context entry con un `projectId` que no existe de forma más explícita en el frontend (ahora mismo el backend ya lo cubre con 404, falta reflejarlo bien en la UI)
+- Posible mejora de UX: confirmación antes de desactivar una entry, para evitar clics accidentales
 
 ### Descartado conscientemente
 
@@ -47,8 +49,9 @@ Abre `http://localhost:3000` para la UI.
 
 ```
 src/
-  main.ts                  → punto de entrada, monta rutas y sirve /public
-  projects/                → CRUD de proyectos
+  main.ts                  → punto de entrada, monta rutas, middleware de errores, sirve /public
+  errors.ts                → clases AppError, NotFoundError, ValidationError
+  projects/                → CRUD de proyectos (service, controller, schemas de validación)
   context-entries/         → CRUD de context entries (anidado bajo /projects/:projectId)
   compiler/                → compila las entries activas de un proyecto en un prompt
   generated/prisma/        → cliente de Prisma generado (no se sube al repo)
