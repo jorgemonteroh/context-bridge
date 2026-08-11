@@ -1,4 +1,5 @@
 import { Request, Response, Router } from 'express';
+import { createEntrySchema, updateEntrySchema } from './context-entries.schemas';
 import * as contextEntriesService from './context-entries.service';
 
 export const contextEntriesRouter = Router({ mergeParams: true });
@@ -12,7 +13,7 @@ contextEntriesRouter.get('/', async (req: Request, res: Response) => {
 
 contextEntriesRouter.post('/', async (req: Request, res: Response) => {
     const projectId = Number(req.params.projectId);
-    const { type, title, content } = req.body;
+    const { type, title, content } = createEntrySchema.parse(req.body);
     const entry = await contextEntriesService.create(projectId, type, title, content);
     res.status(201).json(entry);
 });
@@ -23,7 +24,7 @@ contextEntriesRouter.delete('/:id', async (req: Request, res: Response) => {
 });
 
 contextEntriesRouter.patch('/:id', async (req: Request, res: Response) => {
-    const { type, title, content } = req.body;
+    const { type, title, content } = updateEntrySchema.parse(req.body);
     const entry = await contextEntriesService.update(Number(req.params.id), type, title, content);
     res.json(entry);
 });

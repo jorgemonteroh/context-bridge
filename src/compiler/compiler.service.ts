@@ -40,5 +40,4 @@ export async function compileContext(projectId: number): Promise<string> {
     }
 
     return prompt.trim();
-
 }

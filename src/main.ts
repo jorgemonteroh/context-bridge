@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express, { NextFunction, Request, Response } from 'express';
+import { ZodError } from 'zod';
 import { compilerRouter } from './compiler/compiler.controller';
 import { contextEntriesRouter } from './context-entries/context-entries.controller';
 import { AppError } from './errors';
@@ -15,6 +16,11 @@ app.use('/projects/:projectId/compile-context', compilerRouter);
 app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
     if (err instanceof AppError) {
         res.status(err.statusCode).json({ message: err.message });
+        return;
+    }
+
+    if (err instanceof ZodError) {
+        res.status(400).json({ message: 'Validation error', errors: err.issues });
         return;
     }
 
